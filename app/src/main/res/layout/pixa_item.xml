@@ -15,10 +15,9 @@
         android:id="@+id/cardViewItem"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:elevation="4dp"
         android:layout_margin="8dp"
+        android:elevation="4dp"
         app:cardCornerRadius="24dp">
-<!--        android:onClick="@{() -> clicker.showImage(context, hit.largeImageURL)}"-->
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -30,11 +29,11 @@
                 android:layout_height="150dp"
                 android:layout_marginStart="16dp"
                 android:scaleType="centerCrop"
-                tools:src="@tools:sample/avatars"
                 app:imageUrl="@{hit.previewURL}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/avatars" />
 
             <TextView
                 android:id="@+id/textViewHitTags"
@@ -42,9 +41,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@{hit.tags}"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"
                 app:layout_constraintStart_toEndOf="@+id/imageViewHit"
                 app:layout_constraintTop_toTopOf="@+id/imageViewHit"
                 tools:text="Tags" />

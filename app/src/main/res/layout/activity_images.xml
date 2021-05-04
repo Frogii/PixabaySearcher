@@ -11,6 +11,7 @@
         android:id="@+id/constraintLayoutImages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#FBFBE7"
         tools:context=".ui.ImagesActivity">
 
         <androidx.recyclerview.widget.RecyclerView
