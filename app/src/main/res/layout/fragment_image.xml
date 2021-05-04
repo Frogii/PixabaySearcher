@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="imageFragmentViewModel"
+            type="com.example.databindingtest.ui.ImageFragmentViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="20dp"
+        android:background="#B3000000"
+        android:onClick="@{() -> imageFragmentViewModel.setImageClickSingleEvent()}"
+        android:clickable="true"
+        tools:context=".ui.ImageFragment"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:imageUrl="@{imageFragmentViewModel.getUrl()}"
+            tools:src="@tools:sample/avatars" />
+
+    </FrameLayout>
+</layout>
