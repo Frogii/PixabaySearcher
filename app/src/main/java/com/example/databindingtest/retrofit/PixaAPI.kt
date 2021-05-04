@@ -11,6 +11,7 @@ interface PixaAPI {
     @GET("/api/?image_type=photo")
     suspend fun getPhotos(
         @Query("q") searchString: String,
+        @Query("page") page: Int,
         @Query("key") apiKey: String = BuildConfig.API_KEY
     ): Response<PixaPhoto>
 }
