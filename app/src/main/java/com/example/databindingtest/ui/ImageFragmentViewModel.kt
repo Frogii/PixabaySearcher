@@ -3,7 +3,7 @@ package com.example.databindingtest.ui
 import androidx.lifecycle.ViewModel
 import com.example.databindingtest.utils.SingleLiveEvent
 
-class ImageFragmentViewModel() : ViewModel() {
+class ImageFragmentViewModel : ViewModel() {
 
     private var imageUrl: String? = null
 

@@ -12,10 +12,10 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.lang.Exception
 
-class MainViewModel() : ViewModel() {
+class MainViewModel : ViewModel() {
 
     init {
-        getPhotos()
+        searchPhotos("bananas")
     }
 
     private val _photos: MutableLiveData<Response<PixaPhoto>> = MutableLiveData()
@@ -30,10 +30,10 @@ class MainViewModel() : ViewModel() {
 
     fun getSingleRecyclerEvent() = recyclerEvent
 
-    private fun getPhotos() {
+    fun searchPhotos(searchString: String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.getPhotos("bananas")
+                val response = RetrofitInstance.api.getPhotos(searchString)
                 if (response.isSuccessful) {
                     _photos.postValue(response)
                     Log.d("myLog", "successful response")

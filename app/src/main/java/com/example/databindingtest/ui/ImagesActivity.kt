@@ -1,8 +1,10 @@
 package com.example.databindingtest.ui
 
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -24,21 +26,39 @@ class ImagesActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         mainViewModel.photos.observe(this, Observer {
             it.body()?.hits?.let { hits ->
+                if (hits.isEmpty())
+                    Toast.makeText(this, "Nothing to show", Toast.LENGTH_SHORT).show()
                 recAdapter.setList(hits)
             }
         })
 
         mainViewModel.getSingleRecyclerEvent().observe(this, Observer { url ->
-            Log.d("myLog", url)
-            supportFragmentManager.apply {
-                popBackStack()
-                beginTransaction()
+            supportFragmentManager.beginTransaction()
                     .replace(R.id.constraintLayoutImages, ImageFragment.newInstance(url))
                     .addToBackStack("image_fragment")
                     .commit()
+        })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        val searchViewItem = menu?.findItem(R.id.action_search)
+        val actionSearchView = searchViewItem?.actionView as SearchView
+        actionSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    if (query.isNotEmpty())
+                        mainViewModel.searchPhotos(query)
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                return false
             }
         })
-
+        return super.onCreateOptionsMenu(menu)
     }
 
     private fun setupRecycler() {
