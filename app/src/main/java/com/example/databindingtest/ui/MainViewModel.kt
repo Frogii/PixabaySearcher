@@ -3,6 +3,8 @@ package com.example.databindingtest.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.example.databindingtest.repository.PixaRepository
 import com.example.databindingtest.utils.SingleLiveEvent
 
@@ -24,7 +26,7 @@ class MainViewModel(private val repository: PixaRepository) : ViewModel() {
 
     val photos = currentQuery.switchMap { string ->
         repository.getSearchResults(string)
-    }
+    }.cachedIn(viewModelScope)
 
     companion object {
         private const val DEFAULT_QUERY = "bananas"

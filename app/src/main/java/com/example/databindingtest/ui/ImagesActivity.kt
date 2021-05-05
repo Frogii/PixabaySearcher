@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.databindingtest.R
+import com.example.databindingtest.adapter.ImageLoadStateAdapter
 import com.example.databindingtest.adapter.PagingRecAdapter
 import com.example.databindingtest.databinding.ActivityImagesBinding
 import com.example.databindingtest.repository.PixaRepository
@@ -48,14 +49,17 @@ class ImagesActivity : AppCompatActivity() {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    if (query.isNotEmpty())
+                    if (query.isNotEmpty()) {
+                        binding.recyclerViewImages.scrollToPosition(0)
                         mainViewModel.searchPhotos(query)
+                        actionSearchView.clearFocus()
+                    }
                 }
-                return false
+                return true
             }
 
             override fun onQueryTextChange(query: String?): Boolean {
-                return false
+                return true
             }
         })
         return super.onCreateOptionsMenu(menu)
@@ -63,7 +67,10 @@ class ImagesActivity : AppCompatActivity() {
 
     private fun setupPagingRecycler() {
         pagingRecAdapter = PagingRecAdapter { url -> setRecyclerEvent(url) }
-        binding.recyclerViewImages.adapter = pagingRecAdapter
+        binding.recyclerViewImages.adapter = pagingRecAdapter.withLoadStateHeaderAndFooter(
+            header = ImageLoadStateAdapter { pagingRecAdapter.retry() },
+            footer = ImageLoadStateAdapter { pagingRecAdapter.retry() }
+        )
         binding.recyclerViewImages.setHasFixedSize(true)
         binding.recyclerViewImages.layoutManager = LinearLayoutManager(this)
     }
