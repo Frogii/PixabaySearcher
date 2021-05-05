@@ -1,26 +1,14 @@
 package com.example.databindingtest.ui
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.databindingtest.retrofit.RetrofitInstance
-import com.example.databindingtest.retrofit.model.PixaPhoto
+import androidx.lifecycle.switchMap
+import com.example.databindingtest.repository.PixaRepository
 import com.example.databindingtest.utils.SingleLiveEvent
-import kotlinx.coroutines.launch
-import retrofit2.Response
-import java.lang.Exception
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val repository: PixaRepository) : ViewModel() {
 
-    init {
-        searchPhotos("bananas")
-    }
-
-    private val _photos: MutableLiveData<Response<PixaPhoto>> = MutableLiveData()
-    val photos: LiveData<Response<PixaPhoto>>
-        get() = _photos
+    private val currentQuery = MutableLiveData(DEFAULT_QUERY)
 
     private val recyclerEvent = SingleLiveEvent<String>()
 
@@ -31,16 +19,14 @@ class MainViewModel : ViewModel() {
     fun getSingleRecyclerEvent() = recyclerEvent
 
     fun searchPhotos(searchString: String) {
-        viewModelScope.launch {
-            try {
-                val response = RetrofitInstance.api.getPhotos(searchString)
-                if (response.isSuccessful) {
-                    _photos.postValue(response)
-                    Log.d("myLog", "successful response")
-                }
-            } catch (e: Exception) {
-                Log.d("myLog", e.message.toString())
-            }
-        }
+        currentQuery.value = searchString
+    }
+
+    val photos = currentQuery.switchMap { string ->
+        repository.getSearchResults(string)
+    }
+
+    companion object {
+        private const val DEFAULT_QUERY = "bananas"
     }
 }

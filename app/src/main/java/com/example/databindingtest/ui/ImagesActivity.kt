@@ -2,7 +2,6 @@ package com.example.databindingtest.ui
 
 import android.os.Bundle
 import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
@@ -10,33 +9,34 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.databindingtest.R
-import com.example.databindingtest.adapter.RecAdapter
+import com.example.databindingtest.adapter.PagingRecAdapter
 import com.example.databindingtest.databinding.ActivityImagesBinding
+import com.example.databindingtest.repository.PixaRepository
 
 class ImagesActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityImagesBinding
     lateinit var mainViewModel: MainViewModel
-    lateinit var recAdapter: RecAdapter
+    lateinit var pagingRecAdapter: PagingRecAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_images)
-        setupRecycler()
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        setupPagingRecycler()
+        mainViewModel = ViewModelProvider(
+            this,
+            MainViewModelFactory(PixaRepository())
+        ).get(MainViewModel::class.java)
+
         mainViewModel.photos.observe(this, Observer {
-            it.body()?.hits?.let { hits ->
-                if (hits.isEmpty())
-                    Toast.makeText(this, "Nothing to show", Toast.LENGTH_SHORT).show()
-                recAdapter.setList(hits)
-            }
+            pagingRecAdapter.submitData(this.lifecycle, it)
         })
 
         mainViewModel.getSingleRecyclerEvent().observe(this, Observer { url ->
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.constraintLayoutImages, ImageFragment.newInstance(url))
-                    .addToBackStack("image_fragment")
-                    .commit()
+                .replace(R.id.constraintLayoutImages, ImageFragment.newInstance(url))
+                .addToBackStack("image_fragment")
+                .commit()
         })
     }
 
@@ -61,9 +61,10 @@ class ImagesActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun setupRecycler() {
-        recAdapter = RecAdapter { url -> setRecyclerEvent(url) }
-        binding.recyclerViewImages.adapter = recAdapter
+    private fun setupPagingRecycler() {
+        pagingRecAdapter = PagingRecAdapter { url -> setRecyclerEvent(url) }
+        binding.recyclerViewImages.adapter = pagingRecAdapter
+        binding.recyclerViewImages.setHasFixedSize(true)
         binding.recyclerViewImages.layoutManager = LinearLayoutManager(this)
     }
 

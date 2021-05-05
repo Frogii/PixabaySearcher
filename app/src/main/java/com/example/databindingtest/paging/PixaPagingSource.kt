@@ -1,5 +1,6 @@
 package com.example.databindingtest.paging
 
+import android.util.Log
 import androidx.paging.PagingSource
 import com.example.databindingtest.retrofit.PixaAPI
 import com.example.databindingtest.retrofit.model.Hit
@@ -19,12 +20,16 @@ class PixaPagingSource(
 
         return try {
             val response = api.getPhotos(searchString, position)
-            val photos = response.body()!!.hits
-            LoadResult.Page(
-                data = photos,
-                prevKey = if (position == START_PAGE) null else position - 1,
-                nextKey = if (photos.isEmpty()) null else position + 1
-            )
+            if (response.isSuccessful) {
+                val photos = response.body()!!.hits
+                LoadResult.Page(
+                    data = photos,
+                    prevKey = if (position == START_PAGE) null else position - 1,
+                    nextKey = if (photos.isEmpty()) null else position + 1
+                )
+            } else {
+                LoadResult.Page(listOf(), null, null)
+            }
         } catch (exception: IOException) {
             LoadResult.Error(exception)
         } catch (exception: HttpException) {
