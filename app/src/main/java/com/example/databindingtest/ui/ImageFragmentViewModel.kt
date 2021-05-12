@@ -3,9 +3,13 @@ package com.example.databindingtest.ui
 import androidx.lifecycle.ViewModel
 import com.example.databindingtest.utils.SingleLiveEvent
 
-class ImageFragmentViewModel : ViewModel() {
+class ImageFragmentViewModel(url: String) : ViewModel() {
 
     private var imageUrl: String? = null
+
+    init {
+        imageUrl = url
+    }
 
     private val imageFragmentEvent = SingleLiveEvent<String>()
 
@@ -14,10 +18,6 @@ class ImageFragmentViewModel : ViewModel() {
     }
 
     fun getImageClickSingleEvent() = imageFragmentEvent
-
-    fun onInit(url: String?) {
-        imageUrl = url
-    }
 
     fun getUrl() = imageUrl
 }

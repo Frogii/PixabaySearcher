@@ -17,12 +17,12 @@ class ImageFragment : Fragment() {
 
     lateinit var binding: FragmentImageBinding
     private lateinit var imageFragmentViewModel: ImageFragmentViewModel
-    private var url: String? = null
+    lateinit var url: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            url = it.getString(IMAGE_URL)
+            url = it.getString(IMAGE_URL).toString()
         }
     }
 
@@ -30,8 +30,7 @@ class ImageFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        imageFragmentViewModel = ViewModelProvider(this).get(ImageFragmentViewModel::class.java)
-        imageFragmentViewModel.onInit(url)
+        imageFragmentViewModel = ViewModelProvider(this, ImageFragmentViewModelFactory(url)).get(ImageFragmentViewModel::class.java)
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_image, container, false)
         binding.imageFragmentViewModel = imageFragmentViewModel
         return binding.root
