@@ -1,5 +1,6 @@
 package com.example.databindingtest.ui
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
@@ -11,8 +12,9 @@ import com.example.databindingtest.utils.SingleLiveEvent
 class MainViewModel(private val repository: PixaRepository) : ViewModel() {
 
     private val currentQuery = MutableLiveData(DEFAULT_QUERY)
-
     private val recyclerEvent = SingleLiveEvent<String>()
+    val progressBarState = SingleLiveEvent<Boolean>()
+    val networkError = SingleLiveEvent<String>()
 
     fun setSingleRecyclerEvent(url: String) {
         recyclerEvent.value = url
@@ -27,6 +29,15 @@ class MainViewModel(private val repository: PixaRepository) : ViewModel() {
     val photos = currentQuery.switchMap { string ->
         repository.getSearchResults(string)
     }.cachedIn(viewModelScope)
+
+    fun changeProgressBarState(boolean: Boolean) {
+        progressBarState.value = boolean
+        Log.d("myLog", boolean.toString())
+    }
+
+    fun showError(errorMessage: String) {
+        networkError.value = errorMessage
+    }
 
     companion object {
         private const val DEFAULT_QUERY = "bananas"

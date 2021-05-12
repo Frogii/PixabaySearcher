@@ -7,12 +7,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.databindingtest.R
 import com.example.databindingtest.adapter.ImageLoadStateAdapter
 import com.example.databindingtest.adapter.PagingRecAdapter
 import com.example.databindingtest.databinding.ActivityImagesBinding
 import com.example.databindingtest.repository.PixaRepository
+import com.google.android.material.snackbar.Snackbar
 
 class ImagesActivity : AppCompatActivity() {
 
@@ -23,14 +25,20 @@ class ImagesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_images)
-        setupPagingRecycler()
         mainViewModel = ViewModelProvider(
             this,
             MainViewModelFactory(PixaRepository())
         ).get(MainViewModel::class.java)
+        binding.mainViewModel = mainViewModel
+        binding.lifecycleOwner = this
 
-        mainViewModel.photos.observe(this, Observer {
-            pagingRecAdapter.submitData(this.lifecycle, it)
+        setupPagingRecycler()
+        mainViewModel.photos.observe(this, Observer { data ->
+            pagingRecAdapter.submitData(this.lifecycle, data)
+        })
+
+        mainViewModel.networkError.observe(this, Observer { error ->
+            showSnackbar(error)
         })
 
         mainViewModel.getSingleRecyclerEvent().observe(this, Observer { url ->
@@ -50,8 +58,8 @@ class ImagesActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     if (query.isNotEmpty()) {
-                        binding.recyclerViewImages.scrollToPosition(0)
                         mainViewModel.searchPhotos(query)
+                        binding.recyclerViewImages.scrollToPosition(0)
                         actionSearchView.clearFocus()
                     }
                 }
@@ -71,11 +79,26 @@ class ImagesActivity : AppCompatActivity() {
             header = ImageLoadStateAdapter { pagingRecAdapter.retry() },
             footer = ImageLoadStateAdapter { pagingRecAdapter.retry() }
         )
+        pagingRecAdapter.addLoadStateListener { state ->
+            val refreshState = state.refresh
+            mainViewModel.changeProgressBarState(refreshState == LoadState.Loading)
+            if (refreshState is LoadState.Error) {
+                mainViewModel.showError(refreshState.error.localizedMessage ?: "")
+            }
+        }
         binding.recyclerViewImages.setHasFixedSize(true)
         binding.recyclerViewImages.layoutManager = LinearLayoutManager(this)
     }
 
     private fun setRecyclerEvent(url: String) {
         mainViewModel.setSingleRecyclerEvent(url)
+    }
+
+    fun showSnackbar(message: String) {
+        Snackbar.make(
+            binding.root,
+            message,
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 }

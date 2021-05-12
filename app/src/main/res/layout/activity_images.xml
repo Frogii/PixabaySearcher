@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable
+            name="mainViewModel"
+            type="com.example.databindingtest.ui.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,6 +26,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/pixa_item" />
+
+        <ProgressBar
+            android:id="@+id/progressBarMain"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:indeterminateTint="@color/progress_bar"
+            android:visibility="@{mainViewModel.progressBarState ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

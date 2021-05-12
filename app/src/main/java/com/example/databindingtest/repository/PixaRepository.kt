@@ -14,6 +14,6 @@ class PixaRepository {
         Pager(config = PagingConfig(
             pageSize = 20,
             maxSize = 100,
-            enablePlaceholders = false
+            enablePlaceholders = true
         ), pagingSourceFactory = { PixaPagingSource(api, searchString) }).liveData
 }
